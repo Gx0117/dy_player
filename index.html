@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    .video{
+        width: 1000px;
+        height: 430px;
+        margin: 100px auto;
+        font-size: 0;
+    }
+    .control{
+        width: 940px;
+        height: 35px;
+        background-color: #2c3e50;;
+        padding: 10px 30px;
+    }
+    .con{
+        display: flex;
+        margin-top: 10px;
+        position: relative;
+    }
+    .con input{
+        width: 40px;
+        flex: 0 0 40px;
+        border: 0;
+        outline: 0;
+        text-align: center;
+        background: #2c3e50;
+        color: #fff;
+        font-weight: 700;
+        cursor: default;
+    }
+    .con .progress{
+        width: 666px;
+        height: 15px;
+        background-color: #eff2f6;
+        border-radius: 16px;
+        margin: 0 30px 0 50px;
+        position: relative;
+        display: flex;
+    }
+    .con #play{
+        position: absolute;
+        top: -9px;
+        width: 32px;
+        height: 36px;
+        background: url("images/play-2x.png");
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+    .con .temp{
+        width: 10px;
+        flex: 0 0 10px;
+    }
+    .con .progress .pro-bar{
+        position: absolute;
+        left: 0px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        border-radius: 50%;
+        margin-top: -2.5px;
+        background-color: #1abc9c;
+    }
+    .con .progress .pro-bg{
+        width: 20px;
+        height: 15px;
+        background-color: #1abc9c;
+        opacity: 0.5;
+        border-radius: 16px;
+    }
+    .con #voice{
+        position: absolute;
+        right: 50px;
+        top: -20px;
+        width: 32px;
+        height: 55px;
+        padding-top: 27px;
+        background: url("images/volume-full-2x.png") no-repeat;
+        background-position: center;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+    .con #voice .voice-bar{
+        position: absolute;
+        top: -110px;
+        left: 50%;
+        margin-left: -6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #1abc9c;
+        z-index: 3;
+    }
+    .con #voice .voice-bar-bg{
+        position: absolute;
+        left: 50%;
+        margin-left: -2.5px;
+        bottom: 65px;
+        width: 5px;
+        height: 100px;
+        border-radius: 16px;
+        background-color: #1abc9c;
+        opacity: 0.5;
+        z-index: 2;
+    }
+    .con #voice .voice-bg{
+        position: absolute;
+        left: 50%;
+        margin-left: -2.5px;
+        bottom: 65px;
+        width: 5px;
+        height: 100px;
+        border-radius: 16px;
+        background-color: #fff;
+        opacity: 0.8;
+        z-index: 1;
+    }
+    .con #voice .bgc{
+        position: absolute;
+        bottom: 55px;
+        width: 32px;
+        height: 120px;
+        border-radius: 16px;
+        background-color: #2c3e50;
+        opacity: 0.8;
+    }
+    .block-voice{
+        display: none;
+    }
+    .con #full{
+        position: absolute;
+        right: 0px;
+        top: -8px;
+        width: 30px;
+        height: 30px;
+        background: url("images/fullscreen-2x.png");
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+</style>
+<body>
+    <div class="video">
+        <video id="video" src="dy.mp4" width="1000" ></video>
+        <div class="control">
+            <div class="con">
+                <button id=play></button>
+
+                <div class="progress">
+                    <div class="pro-bg"></div>
+                    <div class="pro-bar"></div>
+                </div>
+
+                <input type="text" value="00:00">
+                <input type="text" value="/" class="temp">
+                <input type="text" value="00:00">
+
+                <button id="voice">
+                    <div class="block-voice">
+                        <div class="voice-bar"></div>
+                        <div class="voice-bar-bg"></div>
+                        <div class="voice-bg"></div>
+                        <div class="bgc"></div>
+                    </div>
+                </button>
+                <button id="full"></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    
+        // 获取元素
+        let video = getId("video"),
+            play = getId("play"),
+            voice = getId("voice"),
+            full = getId("full");
+            input1 = document.getElementsByTagName("input")[0],
+            input2 = document.getElementsByTagName("input")[2],
+            progress = document.getElementsByClassName("progress")[0].children,
+            voice_bar = document.getElementsByClassName("voice-bar")[0],
+            voice_bar_bg = document.getElementsByClassName("voice-bar-bg")[0],
+            block_voice = document.getElementsByClassName("block-voice")[0];
+
+        
+        // 给play注册点击事件
+        let temp = true;
+        play.onclick = function(){
+            if(temp){
+                video.play();
+                play.style.background = "url(images/pause-2x.png) no-repeat";
+            }else{
+                video.pause();
+                play.style.background = "url(images/play-2x.png) no-repeat";
+            }
+            temp = !temp;
+        }
+
+        // 设置视频当前时间
+        video.addEventListener("timeupdate",function(){
+            input1.value = time(parseInt(video.currentTime));
+        },false)
+
+        // 设置视频时间
+        window.onload = function(){
+            input2.value = time(video.duration);
+        }
+
+        // 设置进度条
+        video.addEventListener("timeupdate",function(){
+            let n = video.currentTime / video.duration; // 获取进度条比例
+            // 设置pro_bar left值
+            progress[1].style.left = n * (progress[1].parentNode.offsetWidth - progress[1].offsetWidth)+ "px";
+            // 设置pro_bg width值
+            progress[0].style.width = 20 + n * (progress[1].parentNode.offsetWidth - progress[1].offsetWidth) + "px";
+        },false);
+
+
+        // 给进度条设置点击 移动事件
+        progress[1].onmousedown = function(event){
+            event = event || window.event;
+            let x = event.clientX - this.offsetLeft;
+            document.onmousemove = function(event){
+                event = event || window.event;
+                let _left = event.clientX - x;
+                if(event.clientX - x <= 0){
+                    _left = 0;
+                }else if(event.clientX - x >= 646){
+                    _left = progress[1].parentNode.offsetWidth - progress[1].offsetWidth;
+                }
+                progress[1].style.left = _left + "px";
+                progress[0].style.width = 20 + _left + "px";
+                console.log()
+                video.currentTime = _left / (progress[1].parentNode.offsetWidth - progress[1].offsetWidth) * video.duration;
+            }
+            document.onmouseup = function(){
+                this.onmousemove = null;
+                this.onmouseup = null;
+            }
+        }
+
+        // 设置音量按钮鼠标进入和离开事件
+        voice.onmouseenter = function(){
+            block_voice.style.display = "block";
+        }
+        voice.onmouseleave = function(){
+            block_voice.style.display = "none";
+        }
+
+        // 设置音量
+        voice_bar.onmousedown = function(event){
+            e = event || window.event;
+            let y = e.clientY - voice_bar.offsetTop;
+            document.onmousemove = function(event){
+                e = event || window.event;
+                let _top = e.clientY - y;
+                if(_top <= -110){
+                    _top = -110;
+                }else if(_top >= -20){
+                    _top = -20;
+                }
+                voice_bar.style.top = _top + "px";
+                voice_bar_bg.style.height =  100 - ((110 + _top) / 90 * 100) + "px";
+                video.volume = parseInt(voice_bar_bg.style.height) / 100;
+                console.log(voice_bar_bg.style.height)
+            }
+            document.onmouseup = function(){
+                document.onmousemove =  null;
+                document.onmouseup = null;
+            }
+        }
+
+        // 给full注册点击事件
+        full.onclick = function(){
+            video.requestFullscreen();
+        }
+
+        // 视频时间转换
+        function time(obj){
+            let m = parseInt(obj / 60),
+                s = parseInt(obj % 60);
+            m < 10 ? m = "0" + m : m;
+            s < 10 ? s = "0" + s : s;
+            return m + ":" + s;
+        }
+
+        // 定义获取ID
+        function getId(obj){
+            return document.getElementById(obj);
+        }
+    </script>
+</body>
+</html>
